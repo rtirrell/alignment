@@ -13,7 +13,7 @@ end
 task :default => :test
 
 task :read_example_input do |t|
-  Alignment.parse("data/ExampleInput2.txt")
+  Alignment.align_file("data/ExampleInput2.txt")
 end
 
 task :align, :filepath do |t, args|
@@ -21,5 +21,5 @@ task :align, :filepath do |t, args|
     puts "No filepath given, exiting."
     exit(-1)
   end
-  Alignment.parse(args.filepath)
+  Alignment.align_file(args.filepath)
 end

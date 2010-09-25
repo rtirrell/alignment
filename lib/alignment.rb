@@ -1,7 +1,7 @@
 require "set"
 
 class Alignment
-  def self.parse(filepath)
+  def self.align_file(filepath)
     lines = open(filepath).readlines
     Alignment.new(
       lines[0].strip,
