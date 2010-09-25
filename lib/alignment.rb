@@ -77,10 +77,6 @@ class Alignment
     #                    )
     @ix = matrix(0)
     @tx = matrix(nil)
-#    (1..@nx).each do |i|
-#      @ix[i][0] = -@dx * [i, 1].min - @ex * [i - 1, 0].max
-#      @tx[i][0] = [i - 1, 0, :x]
-#    end
     
     # Ix tracks the best score when A[i] aligns to B[< j]
     # Then Iy[i, j] = max(
@@ -89,10 +85,6 @@ class Alignment
     #                    )
     @iy = matrix(0)
     @ty = matrix(nil)
-#    (1..@ny).each do |j|
-#      @iy[0][j] = -@dy * [j, 1].min - @ey * [j - 1, 0].max
-#      @ty[0][j] = [0, j - 1, :y]
-#    end
      
 #    if !@global 
 #      (@nx + 1).times do |i|
