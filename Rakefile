@@ -12,8 +12,10 @@ end
 
 task :default => :test
 
-task :read_example_input do |t|
-  Alignment.align_file("data/ExampleInput2.txt")
+task :align_example do |t|
+  Alignment.print_matrix(
+    Alignment.align_file("data/ExampleInput.txt").alignments.uniq
+  )
 end
 
 task :align, :filepath do |t, args|

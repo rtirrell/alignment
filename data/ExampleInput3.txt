@@ -1,5 +1,5 @@
-AATGC
-AGGC
+AGC
+AC
 0
 0 0 0 0
 4
