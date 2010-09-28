@@ -2,8 +2,7 @@ require "set"
 
 class Alignment
   attr_accessor :alignments
-  def initialize(a, b, align_globally, gap_penalties,
-    nx, ax, ny, ay, s, debug = false)
+  def initialize(a, b, align_globally, gap_penalties, nx, ax, ny, ay, s)
     @a = a.split("")
     @nx = @a.size
 
@@ -11,7 +10,6 @@ class Alignment
     @ny = @b.size
 
     @align_globally = align_globally
-    #@align_globally = true
     @dx, @ex, @dy, @ey = gap_penalties
 
     @ax = ax
@@ -23,18 +21,6 @@ class Alignment
     align
     output
 
-    if @debug
-      p @m [@nx][@ny]
-      p @ix[@nx][@ny]
-      p @iy[@nx][@ny]
-      Alignment.print_matrix(@m)
-      Alignment.print_matrix(@ix)
-      Alignment.print_matrix(@iy)
-      Alignment.print_matrix(@tm)
-      Alignment.print_matrix(@tx)
-      Alignment.print_matrix(@ty)
-      p @alignments[0], @alignments[1]
-    end
   end
 
   def align
@@ -65,15 +51,6 @@ class Alignment
       
     @ts = {:m => [@m, @tm], :x => [@ix, @tx], :y => [@iy, @ty]}
       
-    #    if !@global
-    #      (@nx + 1).times do |i|
-    #        @f[i][0] = -@dx * [i, 1].min + -@ex * [i - 1, 0].max
-    #      end
-    #      (@ny + 1).times do |j|
-    #        @matrix[0][j] = -@dy * [j, 1].min + -@ey * [j - 1, 0].max
-    #      end
-    #    end
-
     (1..@nx).each do |i|
       (1..@ny).each do |j|
         m_choices = [
@@ -141,12 +118,6 @@ class Alignment
       end
     end
 
-    if @debug
-      Alignment.print_matrix(@m)
-      Alignment.print_matrix(@tm)
-      Alignment.print_matrix(@tx)
-      Alignment.print_matrix(@ty)
-    end
     @max_cells.to_a.each do |max_cell|
       traceback(max_cell[0], max_cell[1], :m).each do |alignment|
         @alignments << alignment
@@ -160,13 +131,9 @@ class Alignment
   # recursively to get a list of alignments from each branch separately.
   def traceback(i, j, tn) 
     alignment = ["", ""]
+      
     loop do
       t = @ts[tn][1]
-      if @debug
-        p "Current position: #{[i, j, tn].inspect}."
-        p "Current alignment: #{alignment.inspect}."
-        p "Considering: #{t[i][j].inspect}."
-      end
       
       return [alignment] if i == 0 || j == 0
       return [alignment] if !@align_globally && @ts[tn][0][i][j] <= 0
