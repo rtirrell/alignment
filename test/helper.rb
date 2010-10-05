@@ -1,11 +1,9 @@
 require 'rubygems'
 require 'test/unit'
+require 'lib/alignment'
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'alignment'
-
-class Test::Unit::TestCase
+def get_out_filepath(in_filepath)
+  return in_filepath[0...in_filepath.rindex(".")] + ".output"
 end
 
 def parse_output(filepath)
@@ -16,15 +14,4 @@ def parse_output(filepath)
   end
   
   [score, alignments.compact.each_slice(2).to_a]
-#  alignments = []
-#  open(filepath).each do |line|
-#    if line =~ /^[\d\.]+$/
-#    elsif line =~ /^$/
-#      alignments << []
-#    else
-#      alignments[-1] << line.strip
-#    end
-#  end
-#  p "lines", alignments
-#  return alignments
 end

@@ -1,12 +1,9 @@
-###
-# TODO: initialization.
-###
 require "set"
 
 class Alignment
-  attr_reader :alignments
-  attr_reader :max_score
-  alias :score :max_score
+  attr_reader :align_globally, :alignments, :score
+  attr_reader :m, :ix, :iy, :tm, :tx, :ty
+  
   def initialize(a, b, align_globally, gap_penalties, nx, ax, ny, ay, s)
     # First sequence.
     @a = a.split("")
@@ -30,19 +27,6 @@ class Alignment
     # All alignments.
     @alignments = []
       
-    align
-#    output
-    
-#    p @max_score
-#    p @max_cells
-    p @s
-    write_traceback(@tm, :m)
-    write_traceback(@tx, :x)
-    write_traceback(@ty, :y)
-
-  end
-
-  def align
     # M tracks the best score of an alignment ending in A[i], B[j]
     # Then M[i, j] = max(
     #                      M [i - 1, j - 1] + s(A[i], B[j])
@@ -70,15 +54,18 @@ class Alignment
       
     @ts = {:m => [@m, @tm], :x => [@ix, @tx], :y => [@iy, @ty]}
     
+    # Initialization code seems to be unnecessary.
 #    if @align_globally
 #      (1..@nx).each do |i|
-#        @ix[i][0] = -@dx * [i, 1].min - @ex * [i - 1, 0].max
+#        @ix[i][0] = -@dy * [i, 1].min - @ey * [i - 1, 0].max
 #      end
 #      (1..@ny).each do |j|
-#        @iy[0][j] = -@dy * [j, 1].min - @ey * [j - 1, 0].max
+#        @iy[0][j] = -@dx * [j, 1].min - @ex * [j - 1, 0].max
 #      end
 #    end
       
+    # Iterate over columns. Collect traceback information now, to be used after
+    # we're done aligning. Pretty straightforward, I hope.
     (1..@nx).each do |i|
       (1..@ny).each do |j|
         m_choices = [
@@ -89,57 +76,55 @@ class Alignment
         choose_top(i, j, :m, m_choices)
        
         ix_choices = [
-          [@m [i - 1][j] - @dx, [i - 1, j, :m]],
-          [@ix[i - 1][j] - @ex, [i - 1, j, :x]]
+          [@m [i - 1][j] - @dy, [i - 1, j, :m]],
+          [@ix[i - 1][j] - @ey, [i - 1, j, :x]]
         ]
         choose_top(i, j, :x, ix_choices)
 
         iy_choices = [
-          [@m [i][j - 1] - @dy, [i, j - 1, :m]],
-          [@iy[i][j - 1] - @ey, [i, j - 1, :y]]
+          [@m [i][j - 1] - @dx, [i, j - 1, :m]],
+          [@iy[i][j - 1] - @ex, [i, j - 1, :y]]
         ]
         choose_top(i, j, :y, iy_choices)
       end
     end
 
-    # Since we don't allow endgaps, we find the highest-scoring alignment in
-    # the last row or column of M. 
-    @max_score = @m[@nx][@ny]
+    @score = @m[@nx][@ny]
     @max_cells = Set.new
 
     if @align_globally
       # Check last row.
       (0..@ny).each do |j|
-        if @m[@nx][j] >= @max_score
-          if @m[@nx][j] > @max_score
-            @max_cells.clear
-            @max_score = @m[@nx][j]
-          end
+        if in_delta?(@m[@nx][j], @score)
           @max_cells << [@nx, j]
+        elsif @m[@nx][j] > @score
+          @max_cells.clear
+          @max_cells << [@nx, j]
+          @score = @m[@nx][j]
         end
       end
 
       # Check last column.
       (0..@nx).each do |i|
-        if @m[i][@ny] >= @max_score
-          if @m[i][@ny] > @max_score
-            @max_cells.clear
-            @max_score = @m[i][@ny]
-          end
+        if in_delta?(@m[i][@ny], @score)
           @max_cells << [i, @ny]
+        elsif @m[i][@ny] > @score
+          @max_cells.clear
+          @max_cells << [i, @ny]
+          @score = @m[i][@ny]
         end
       end
       
     else
-      # Check everything.
+      # This is local, so check every cell.
       (0..@nx).each do |i|
         (0..@ny).each do |j|
-          if @m[i][j] >= @max_score
-            if @m[i][j] > @max_score
-              @max_cells.clear
-              @max_score = @m[i][j]
-            end
+          if in_delta?(@m[i][j], @score)
             @max_cells << [i, j]
+          elsif @m[i][j] > @score
+            @max_cells.clear
+            @max_cells << [i, j]
+            @score = @m[i][j]
           end
         end
       end
@@ -154,7 +139,7 @@ class Alignment
   end
   
   ##
-  # Starting from each max cell, traceback returns a list of alignments
+  # Starting from an [i, j, tn] cell, traceback returns a list of alignments
   # beginning from that cell. Whenever a branching cell is encountered, call
   # recursively to get a list of alignments from each branch separately.
   def traceback(i, j, tn) 
@@ -162,34 +147,48 @@ class Alignment
       
     loop do
       t = @ts[tn][1]
-      puts [[i, j, tn], t[i][j]].inspect
-      puts alignment.inspect
       
+      # Are we at the end?
       return [alignment] if i == 0 || j == 0
+      # If performing a local alignment, has the score dropped below 0?
       return [alignment] if !@align_globally && @ts[tn][0][i][j] <= 0
       
+      # Insert as appropriate.
       if t[i][j][0][0] == i - 1
         alignment[0].insert(0, @a[i - 1])
       else
-        alignment[0].insert(0, "_")
+        alignment[0].insert(0, '_')
       end
       if t[i][j][0][1] == j - 1
         alignment[1].insert(0, @b[j - 1])
       else
-        alignment[1].insert(0, "_")
+        alignment[1].insert(0, '_')
       end
       
+      # During local alignment, you must implement the following simplification. 
+      # If you trace back to a cell that contains pointers to a zero in the M 
+      # matrix and a pointer to a zero in the Ix or Iy matrix, you should only 
+      # follow the pointer to the zero in the M matrix and terminate your 
+      # traceback there only. This will prevent you from having alignments 
+      # that are right-sided substrings.
+      
+      # If there are multiple possible traceback paths originating in this cell,
+      # recurse and follow them individually.
       if t[i][j].size > 1
-        c = 0
-        puts "BRANCHING"
+        # If we are tracing back to a cell with a 0 in the M matrix, we ignore
+        # other possible tracebacks.
+        if t[i][j].any? {|c| c[2] == :m && @m[c[0]][c[1]] == 0}
+          tracebacks = t[i][j].select {|c| c[2] == :m}
+        else
+          tracebacks = t[i][j]
+        end
+        
         subalignments = []
-        t[i][j].each do |cell|
-          puts "BRANCHING #{c += 1}."
+        tracebacks.each do |cell|
           traceback(cell[0], cell[1], cell[2]).each do |subalignment|
             subalignments << subalignment
           end
         end
-        p subalignments.inspect
         return subalignments.map do |subalignment|
           [
             subalignment[0] + alignment[0],
@@ -202,18 +201,6 @@ class Alignment
     end
   end
   
-  def output
-    open("1.output", "w") do |f|
-      f.puts(@max_score)
-      f.puts
-      @alignments.uniq.each do |alignment|
-        f.puts(alignment[0])
-        f.puts(alignment[1])
-        f.puts
-      end
-    end
-  end
-  
   ##
   # For the given set of choices for the score at i, j in the score matrix 
   # named by tn, pick all max-scores, set the score matrix to that value and 
@@ -222,7 +209,7 @@ class Alignment
     choices << [0, nil] if !@align_globally
     @ts[tn][0][i][j] =  choices.max {|a, b| a[0] <=> b[0]}[0]
     choices.each do |choice|
-      if in_delta(choice[0], @ts[tn][0][i][j])
+      if in_delta?(choice[0], @ts[tn][0][i][j])
         @ts[tn][1][i][j] << choice[1]
       end
     end
@@ -232,13 +219,13 @@ class Alignment
     (0..@nx).map {|i| (0..@ny).map {|j| f.call}}
   end
   
-  def in_delta(a, b, delta = 0.001)
+  def in_delta?(a, b, delta = 0.00000001)
     return (a - b).abs < delta ? true : false
   end
-
+  
   def self.align_file(filepath)
     lines = open(filepath).readlines
-    Alignment.new(
+    alignment = Alignment.new(
       lines[0].strip,
       lines[1].strip,
       lines[2].strip == "0",
@@ -254,23 +241,36 @@ class Alignment
         end
       ]
     )
+    open(filepath[0...(filepath.rindex("."))] + ".output.mine", "w") do |f|
+      f.puts("#{alignment.score}\n\n")
+      alignment.alignments.uniq.each do |a|
+        f.puts(a[0])
+        f.puts("#{a[1]}\n\n")
+      end
+    end
+    print "File: #{File.basename(filepath)}\tscore: #{alignment.score}\t" 
+    puts "global: #{alignment.align_globally}"
+    return alignment
   end
 
-  def self.print_matrix(t)
+  def self.print_matrix(t, f = $stdout)
     t.each_with_index do |r, i|
-      puts "#{i}: #{r.inspect}"
+      f.puts "#{i}: #{r.inspect}"
     end
   end
   
-  def write_traceback(t, tn)
+  def self.write_traceback(t, tn)
     open("Traceback#{tn.to_s.upcase}.tsv", "w") do |f|
-      max_length = t.flatten.max {|a, b| a.inspect.size <=> b.inspect.size}.inspect.size
       t.each do |r|
         r.each do |c|
-          f.print("%#{max_length}s\t" % [c.inspect])
+          f.print(c.inspect)
         end
         f.puts
       end
     end
   end
+end
+
+if __FILE__ == $0
+  Alignment.align_file(ARGV[0])
 end

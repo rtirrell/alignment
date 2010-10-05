@@ -1,0 +1,231 @@
+BMI 214
+Autumn 2010-2011
+Programming Project 1 Quiz
+
+Your name: Rob Tirrell
+
+SUNet ID: rpt
+
+
+Instructions:
+-----------------
+Please be sure to run all the alignments (see 
+http://helix-web.stanford.edu/bmi214/files/p1/for_quiz/). Do not 
+forget to include the results of this quiz in your submission.  Specifically, 
+include a folder called alignments with inputs/outputs, and include your 
+answers to the below problems.  See the submission instructions in the main 
+Project 1 handout for complete details.
+
+REMEMBER that you must strictly follow the instructions for naming output 
+folders and files!!!
+
+Question 1: Global alignment of two DNA sequences.
+Input file: alignment0.input
+Please fill in the three score matrices (the insertion, deletion, and match 
+matrices). Be sure to include tracebacks (all possible ones) for aligning the 
+sequence in alignment0.input. Name all your matrices and use the according 
+names/symbols for the tracebacks.
+
+M
+0: [0, 0, 0, 0, 0]
+1: [0, 1.0, 0.0, 0.0, 0.0]
+2: [0, 1.0, 1.0, 1.0, 1.0]
+3: [0, 0.0, 1.0, 1.0, 1.0]
+4: [0, 0.0, 2.0, 2.0, 1.0]
+5: [0, 0.0, 1.0, 2.0, 3.0]
+
+Ix
+0: [0, 0, 0, 0, 0]
+1: [0, 0.0, 0.0, 0.0, 0.0]
+2: [0, 1.0, 0.0, 0.0, 0.0]
+3: [0, 1.0, 1.0, 1.0, 1.0]
+4: [0, 1.0, 1.0, 1.0, 1.0]
+5: [0, 1.0, 2.0, 2.0, 1.0]
+
+Iy
+0: [0, 0, 0, 0, 0]
+1: [0, 0.0, 1.0, 1.0, 1.0]
+2: [0, 0.0, 1.0, 1.0, 1.0]
+3: [0, 0.0, 0.0, 1.0, 1.0]
+4: [0, 0.0, 0.0, 2.0, 2.0]
+5: [0, 0.0, 0.0, 1.0, 2.0]
+TM
+0: [[], [], [], [], []]
+1: [[], [[0, 0, :m], [0, 0, :x], [0, 0, :y]], [[0, 1, :m], [0, 1, :x], [0, 1, :y]], [[0, 2, :m], [0, 2, :x], [0, 2, :y]], [[0, 3, :m], [0, 3, :x], [0, 3, :y]]]
+2: [[], [[1, 0, :m], [1, 0, :x], [1, 0, :y]], [[1, 1, :m]], [[1, 2, :y]], [[1, 3, :y]]]
+3: [[], [[2, 0, :m], [2, 0, :x], [2, 0, :y]], [[2, 1, :m], [2, 1, :x]], [[2, 2, :m], [2, 2, :y]], [[2, 3, :m], [2, 3, :y]]]
+4: [[], [[3, 0, :m], [3, 0, :x], [3, 0, :y]], [[3, 1, :x]], [[3, 2, :m], [3, 2, :x]], [[3, 3, :m], [3, 3, :x], [3, 3, :y]]]
+5: [[], [[4, 0, :m], [4, 0, :x], [4, 0, :y]], [[4, 1, :x]], [[4, 2, :m]], [[4, 3, :m], [4, 3, :y]]]
+
+Tx
+0: [[], [], [], [], []]
+1: [[], [[0, 1, :m], [0, 1, :x]], [[0, 2, :m], [0, 2, :x]], [[0, 3, :m], [0, 3, :x]], [[0, 4, :m], [0, 4, :x]]]
+2: [[], [[1, 1, :m]], [[1, 2, :m], [1, 2, :x]], [[1, 3, :m], [1, 3, :x]], [[1, 4, :m], [1, 4, :x]]]
+3: [[], [[2, 1, :m], [2, 1, :x]], [[2, 2, :m]], [[2, 3, :m]], [[2, 4, :m]]]
+4: [[], [[3, 1, :x]], [[3, 2, :m], [3, 2, :x]], [[3, 3, :m], [3, 3, :x]], [[3, 4, :m], [3, 4, :x]]]
+5: [[], [[4, 1, :x]], [[4, 2, :m]], [[4, 3, :m]], [[4, 4, :m], [4, 4, :x]]]
+
+Ty
+0: [[], [], [], [], []]
+1: [[], [[1, 0, :m], [1, 0, :y]], [[1, 1, :m]], [[1, 2, :y]], [[1, 3, :y]]]
+2: [[], [[2, 0, :m], [2, 0, :y]], [[2, 1, :m]], [[2, 2, :m], [2, 2, :y]], [[2, 3, :m], [2, 3, :y]]]
+3: [[], [[3, 0, :m], [3, 0, :y]], [[3, 1, :m], [3, 1, :y]], [[3, 2, :m]], [[3, 3, :m], [3, 3, :y]]]
+4: [[], [[4, 0, :m], [4, 0, :y]], [[4, 1, :m], [4, 1, :y]], [[4, 2, :m]], [[4, 3, :m], [4, 3, :y]]]
+5: [[], [[5, 0, :m], [5, 0, :y]], [[5, 1, :m], [5, 1, :y]], [[5, 2, :m]], [[5, 3, :m]]]
+
+ATGC
+AGGC
+
+AATGC
+A_GGC
+
+AATGC
+AG_GC
+
+ATG_C
+A_GGC
+
+AATG_C
+A__GGC
+
+
+Question 2: Align the sequences in alignment1.input. Look at your results. How 
+would you expect the alignment to look if you modified the gap penalties 
+to be 1.5 for open and 0.5 for extend for both sequences? (Difference in the
+alignment attributes, size of aligned regions, etc)
+I would expected the aligned regions to be longer, as the gap penalty is greater
+and we are performing an ends-free alignment. There would be more bases aligned
+with negative alignment scores.
+
+Question 3: Create the alignment2.input file from alignment1.input, except 
+perform a global alignment of the same two DNA sequences with different gap 
+penalties.
+Input file: alignment2.input:  create this file yourself by modifying 
+alignment1.input gap penalty to (1.5 0.5 1.5 0.5).
+What is the alignment score? 8.1
+
+Question 4: Perform the alignment on Input file: alignment3.input. Based on the 
+output from alignment3, what is the average number of gap characters in the 
+first sequence?   
+(The first sequence is the one that was on line 1 of the input file.)
+25 / 6 = 4.17
+
+Question 5: 
+Global alignment of the same two protein sequences with different gap 
+penalties.  
+Input file: alignment4.input:  create this file yourself by modifying 
+alignment3.input gap penalty to (1.5 0.5 1.5 0.5)
+
+Based on the output from alignment4, what is the average number of gap 
+characters in the first sequence? If you do not succeed in aligning, explain 
+what you expect to see.
+(The first sequence is the one that was on line 1 of the input file.)
+5 / 2 = 2.5
+
+Question 6: Global alignment of the same two protein sequences with different 
+gap penalties.  
+Input file: alignment5.input:  create this file yourself by modifying 
+alignment3.input gap penalty to (4.5 1.5 4.5 1.5)
+Alignment Score: 580.0
+
+Question 7:
+Based on the output from alignment5, what is the average number of gap 
+characters in the first sequence?  If you do not succeed in aligning, explain 
+what you expect to see.
+(The first sequence is the one that was on line 1 of the input file.)
+0
+
+Question 8:
+Compare the alignments for sequences 3, 4 and 5. What are the differences you 
+see? Why do you see these differences? 
+Alignments 3 and 4 are quite similar, the change in gap open and extension penalties
+are not great enough to significantly change an alignment of that extent. However, there
+are fewer alignments for 4, as there are fewer positions where opening a new gap is
+acceptable to the algorithm (as they are more expensive). And 5 is a more 
+extreme case of 4, the gap open penalty is too great, and no gaps are used.
+
+
+Question 9: Perform local alignment of two protein sequences with gap penalty 
+(3 1 3 1).  
+Input file:  alignment6.input
+How much of each sequence do you see in the alignments? (We do not need an 
+exact number but tell us what parts of the sequences, if any, are missing)
+Significant chunks of the end of the sequence sequence are missing.
+
+Question 10 : 
+Why would you be interested in performing this kind of local alignment? What might you infer from the results of these two sequences (what is sequence 1 
+with respect to sequence 2)?
+Both appear to members of the GrpE superfamily, and so one might be interested
+in looking at sequence conservation at some interesting motif across organisms.
+There seems to be a few blocks of reasonable similarity, with a lot of junk
+interspersed.
+
+Question 11: Local alignment of the same two protein sequences with different 
+gap penalties.  
+Input file: alignment7.input:  create this file yourself by modifying 
+alignment6.input gap penalty to (5 1 5 1). If you are not able to perform the 
+alignments, what would you expect to see?
+Alignment Score: 137.
+
+Question 12:
+Why do you see a difference in the two alignments?
+The gap penalties are greater in 7, resulting in fewer internal choices and thus fewer total
+alignments, shorter alignments, and (obviously), less gapping.
+
+Question 13:
+Perform the local alignment of two DNA sequences using alignment8.input
+How much of each sequence do you see? (Count the number of letters missing from 
+the front and back of each sequence).
+Missing:
+Sequence one: 2		0
+Sequence two: 11	3
+So, you see most of sequence one, and miss a portion of the beginning of sequence two.
+
+
+Question 14:
+Perform the local alignment of the above (DNA translated into protein) 
+sequences in alignment9.input
+How much of each of these sequences do you see? (Count the number of letters 
+missing from the front and back of each sequence).
+Missing:
+Sequence one: 1	5/0
+Sequence two: 4	4/1
+Depending on the alignment, you miss a large proportion of each sequence.
+
+Question 15:
+Discuss the differences between the alignments, and explain why you think they 
+exist. 
+Translating DNA to proteins transforms your problem to one with a larger alphabet,
+and one where codon wobble can introduce the same peptide for a different sequence
+of bases, so in some sense the alignment is messier, and this is partially
+reflected in the match matrix.
+
+Question 16:
+Which alignment makes the most sense? (Describe a scenario when you would want 
+to use one alignment over the other).
+To assess evolution rates by nucleotide substitution, you'd want to align the
+DNA, or to search for orthology/paralogy/etc. To compare function, a protein alignment makes more sense.
+
+Question 17:
+Briefly discuss when you want to use local alignment.
+Among other reasons, when you're not sure which subsequence of your string is
+the interesting part that is likely to be conserved, and thus you want to find
+locally maximal regions.
+
+Question 18: 
+Briefly discuss when you want to use global alignment.
+To compare sequences of known origin (ie, you know this is the entire transcript, etc.),
+or to compare strings with respect to terminal motifs or features.
+
+
+Question 19:
+Briefly discuss the advantage of DNA alignments (as opposed to protein 
+alignments).
+Smaller alphabet, easier to find homology, no need to worry about changes to the
+protein during translation that may obscure existing biological relationships.
+
+Question 20: 
+Briefly discuss the advantage of protein alignments (as opposed to DNA 
+alignments).  
+No issues of nucleotide substitution or posttranscriptional modification, gives
+one a better idea of functional conservation.

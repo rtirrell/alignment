@@ -3,15 +3,23 @@ require 'lib/alignment'
 
 class TestAlignment < Test::Unit::TestCase
   def test_examples
-    [0, 1, 2, 3, 4, 5, 6].each do |i|
-      puts "Testing alignment #{i}."
-      in_filepath = File.join('data/examples', "alignment_example#{i}.input")
-      out_filepath = File.join('data/examples', "alignment_example#{i}.output")
-      
+    Dir.glob("data/{examples,for_quiz}/*.input").each do |in_filepath|
       alignment = Alignment.align_file(in_filepath)
-      correct_score, correct_alignments = parse_output(out_filepath)
-      assert_equal(correct_alignments.sort, alignment.alignments.uniq.sort)
-      #assert_in_delta(correct_score, alignment.score, 0.001)
+      out_filepath = get_out_filepath(in_filepath)
+      next if !File.exists?(out_filepath)
+      cscore, calignments = parse_output(out_filepath)
+      
+      assert_equal(
+        calignments.uniq.sort, 
+        alignment.alignments.uniq.sort,
+        "Alignments not equal at #{in_filepath}."
+      )
+      assert_in_delta(
+        cscore, 
+        alignment.score, 
+        0.001,
+        "Scores not equal at #{in_filepath}."
+      )
     end
   end
 end
